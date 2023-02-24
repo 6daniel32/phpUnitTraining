@@ -1,0 +1,5 @@
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.22.0.4. Set the 'ServerName' directive globally to suppress this message
+[Wed Feb 15 17:35:42.585763 2023] [ssl:warn] [pid 1] AH01873: Init: Session Cache is not configured [hint: SSLSessionCache]
+[Wed Feb 15 17:35:42.588932 2023] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.54 (Debian) PHP/8.0.28 OpenSSL/1.1.1n configured -- resuming normal operations
+[Wed Feb 15 17:35:42.589040 2023] [core:notice] [pid 1] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Feb 15 17:36:26.599076 2023] [mpm_prefork:notice] [pid 1] AH00170: caught SIGWINCH, shutting down gracefully

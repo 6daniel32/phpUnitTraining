@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+
+  training_db:
+    build:
+      context: .
+      dockerfile: ./mariadb/Dockerfile
+    container_name: training_db
+    hostname: training_db
+    ports:
+      - "3306:3306"
+    networks:
+      - training_network
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: test
+      MYSQL_PASSWORD: secret
+    volumes:
+      # Will use db volume and inside to path /var/lib/mysql
+      - training_db:/var/lib/mysql
+
+  training_phpmyadmin:
+    # Depends on only works within same stack, but not between remote containers (even on user-defined network)
+    depends_on:
+      - training_db
+    image: phpmyadmin/phpmyadmin
+    networks:
+      - training_network
+    container_name: training_phpmyadmin
+    hostname: training_phpmyadmin.test
+    ports:
+      # Exposes external port 7000 mapped to internal of 80
+      # Database required no external port of its own
+      - 7000:80
+    environment:
+      PMA_HOST: training_db
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: test
+      MYSQL_PASSWORD: secret
+      # Variable to increase upload limit for importing sql db files
+      UPLOAD_LIMIT: 500000K
+
+  apache:
+    build:
+      context: .
+      dockerfile: apache/Dockerfile
+    container_name: apache
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./apache/httpd/httpd.conf:/etc/apache2/apache2.conf:rw
+      - ./apache/httpd/vhosts.conf:/etc/apache2/vhosts.conf:rw
+      - ./apache/logs:/var/log/apache2:rw
+    depends_on:
+      - training_db
+    networks:
+      - training_network
+
+volumes:
+  # Creates persistent storage volume for database
+  # Specify name so it does not append stack name in front
+  training_db:
+    driver: local
+    name: training_db
+
+networks:
+  # This will create a user-defined network with name of training_network
+  # Specify name so that it does not append stack name and become db_training_network
+  training_network:
+    name: training_network
+      
+
